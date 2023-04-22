@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import FileManager from "./components/FileManager";
 import fs from 'fs';
 import { ipcRenderer } from 'electron';
+import RightSidePopup from "./components/Features/RightSidePopup";
 
 export default () => {
     const windowSize = useRef([window.innerWidth, window.innerHeight]);
@@ -10,7 +11,7 @@ export default () => {
 
     let textEditorStyle = {
         inner:{
-            width: '612pt',
+            width: '80vw',
             height:'100%',
             border: '0px',
             boxShadow: "0px 0px 10px #ddd"
@@ -21,6 +22,26 @@ export default () => {
             justifyContent: "center",
             height:windowSize.current[1],
         }
+    }
+
+    let sidePopUpDiv = {
+        inner:{
+            width: '3vw',
+            height:'60vh',
+            border: '0px',
+            boxShadow: "0px 0px 10px #ddd",
+            backgroundColor: '#e0dedc',
+          },
+          outer:{
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            display:'flex',
+            alignItems: "center",
+            justifyContent: "center",
+            marginRight: '2rem',
+            height:windowSize.current[1],          
+          }
     }
 
     const [filePath, setFilePath] = useState(null);
@@ -121,10 +142,11 @@ export default () => {
             alert("The file has been succesfully saved");
         }); 
     }
+    // 
 
     return (
         <>  
-            <div>
+            <div style={{display: 'flex', flexDirection: 'row'}}>
                 <div style={{
                     backgroundColor:'#eeefff',
                     float:'left',
@@ -133,13 +155,20 @@ export default () => {
                     border:0,
                 }}>
                 <FileManager/>
+                <button id="load-file-button" onClick={loadNotesFile}>Load File</button>
+                <button id="save-file-button" onClick={saveNotesFile}>Save File</button>
                 </div>
                 <div style={textEditorStyle.outer}>
                     <textarea id="file-input" style={textEditorStyle.inner} value={fileContent} onChange={handleNewCharacter}/>
                 </div>
-                <button id="load-file-button" onClick={loadNotesFile}>Load File</button>
-                <button id="save-file-button" onClick={saveNotesFile}>Save File</button>
+
+                <div style={sidePopUpDiv.outer}>
+                    <RightSidePopup style={sidePopUpDiv.inner}/>
+                </div>
+
+                
             </div>
+            
         </>
     )
 };
