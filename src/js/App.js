@@ -16,7 +16,7 @@ export default () => {
             boxShadow: "0px 0px 10px #ddd"
         },
         outer:{
-            display:'flex',
+            display: 'flex',
             alignItems: "center",
             justifyContent: "center",
             height:windowSize.current[1],
@@ -124,19 +124,22 @@ export default () => {
 
     return (
         <>  
-            <div>
+            <div style={{
+                flexDirection:"row",
+                justifyContent:'space-between'
+            }}>
                 <div style={{
                     backgroundColor:'#eeefff',
-                    float:'left',
                     width:'20%',
                     height:windowSize.current[1],
                     border:0,
                 }}>
                 <FileManager/>
                 </div>
-                <div style={textEditorStyle.outer}>
+                <div style={textEditorStyle.outer} >
                     <textarea id="file-input" style={textEditorStyle.inner} value={fileContent} onChange={handleNewCharacter}/>
                 </div>
+
                 <button id="load-file-button" onClick={loadNotesFile}>Load File</button>
                 <button id="save-file-button" onClick={saveNotesFile}>Save File</button>
             </div>
