@@ -1,4 +1,4 @@
-const { win, BrowserWindow, app, ipcMain, Menu, dialog} = require('electron');
+const { BrowserWindow, app, ipcMain, Menu, dialog} = require('electron');
 const fs = require("fs");
 const path = require('path');
 const homedir = require('os').homedir();
@@ -21,6 +21,8 @@ async function createWindow() {
     });
 
     win.loadFile('index.html');
+
+    win.webContents.openDevTools();
 }
 
 ipcMain.on('load-file', (event) => {  
