@@ -22,6 +22,12 @@ async function createWindow() {
 
     win.loadFile('index.html');
 
+    win.setTitle('Slant');
+
+    win.setIcon('./src/images/slant-logo-full.png')
+
+    win.setMinimumSize(400, 300);
+
     win.webContents.openDevTools();
 
     // adding menu with File and Edit options to the window
