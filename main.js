@@ -23,6 +23,52 @@ async function createWindow() {
     win.loadFile('index.html');
 
     win.webContents.openDevTools();
+
+    // adding menu with File and Edit options to the window
+    const menu = Menu.buildFromTemplate([
+        {
+            label: 'Slant',
+            submenu: [
+                { 
+                    label: process.platform === 'darwin' ? 'Quit' : 'Exit',
+                    click: () => {
+                        app.quit();
+                    }
+                },
+            ]
+        },
+        {
+            label: 'File',
+            submenu: [
+                {
+                    label: 'Open',
+                    click: () => {
+                        win.webContents.send('load-file');
+                    }
+                },
+                {
+                    label: 'Save',
+                    click: () => {
+                        win.webContents.send('save-file');
+                    }
+                },
+            ]
+        },
+        {
+            label: 'Edit',
+            submenu: [
+                { role: 'undo' },
+                { role: 'redo' },
+                { type: 'separator' },
+                { role: 'cut' },
+                { role: 'copy' },
+                { role: 'paste' },
+            ]
+
+        }
+    ]);
+
+    Menu.setApplicationMenu(menu);
 }
 
 ipcMain.on('load-file', (event) => {  

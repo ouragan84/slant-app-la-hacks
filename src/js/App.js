@@ -43,10 +43,12 @@ export default () => {
     // When the crtl + s is pressed, save the file to the disk
     useEffect(() => {
         const handleKeyDown = (event) => {
-          if (event.metaKey && event.key === 's') {
-            console.log()
-            saveNotesFile();
-          }
+            if (event.metaKey && event.key === 's') {
+                saveNotesFile();
+            }
+            if (event.metaKey && event.key === 'o') {
+                loadNotesFile();
+            }
         };
       
         document.addEventListener('keydown', handleKeyDown);
