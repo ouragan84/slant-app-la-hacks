@@ -52,18 +52,33 @@ export default () => {
         };
       
         document.addEventListener('keydown', handleKeyDown);
+
+        ipcRenderer.on('file-loaded', (event, file) => {
+            console.log('obtained file from main process: ' + file);
+            setFilePath(file);
+            readFile(file);
+        });
+    
+        ipcRenderer.on('file-saved', (event, file) => {
+            console.log('file saves ' + file);
+            setFilePath(file);
+        });
+    
+        ipcRenderer.on('load-file', (event) => {
+            console.log('loading file')
+            loadNotesFile();
+        });
+    
+        ipcRenderer.on('save-file', (event) => {
+            console.log('saving file')
+            saveNotesFile();
+        });
+
+        return () => {
+            ipcRenderer.removeAllListeners(IPCConstants.UPDATE_SALE_CUSTOMER);
+        };
+        
       }, []);
-
-    ipcRenderer.on('file-loaded', (event, file) => {
-        console.log('obtained file from main process: ' + file);
-        setFilePath(file);
-        readFile(file);
-    });
-
-    ipcRenderer.on('file-saved', (event, file) => {
-        console.log('file saves ' + file);
-        setFilePath(file);
-    });
 
     const saveNotesFile = () => {
         // var actualFilePath = document.getElementById("actual-file").value;
@@ -120,7 +135,7 @@ export default () => {
                 <FileManager/>
                 </div>
                 <div style={textEditorStyle.outer}>
-                    <textarea id="file-input" style={textEditorStyle.inner}/>
+                    <textarea id="file-input" style={textEditorStyle.inner} value={fileContent} onChange={handleNewCharacter}/>
                 </div>
                 <button id="load-file-button" onClick={loadNotesFile}>Load File</button>
                 <button id="save-file-button" onClick={saveNotesFile}>Save File</button>
