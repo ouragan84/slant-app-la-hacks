@@ -1,5 +1,10 @@
-const { win, BrowserWindow, app, ipcMain, Menu} = require('electron');
-const fs = require("fs-extra");
+const { win, BrowserWindow, app, ipcMain, Menu, dialog} = require('electron');
+const fs = require("fs");
+const path = require('path');
+const homedir = require('os').homedir();
+
+console.log('homedir', homedir)
+
 
 async function createWindow() {
     let win = new BrowserWindow({
@@ -7,15 +12,82 @@ async function createWindow() {
         height: 600,
         backgroundColor: '#ffffff',
         webPreferences: {
-            nodeIntegration: false,
+            nodeIntegration: true,
+            contextIsolation: false,
             worldSafeExecuteJavaScript: true,
-            contextIsolation: true,
+            enableRemoteModule: true,
             // preload: `${__dirname}/preload.js`
         }
     });
 
     win.loadFile('index.html');
 }
+
+ipcMain.on('load-file', (event) => {  
+    // If the platform is 'win32' or 'Linux'
+    // Resolves to a Promise<Object>
+    dialog.showOpenDialog({
+        title: 'Select the File to be opened',
+        defaultPath: path.join(homedir, 'Desktop'),
+        buttonLabel: 'Open',
+        // Restricting the user to only Text Files.
+        filters: [ 
+        { 
+            name: 'Slant Files', 
+            extensions: ['sla'] 
+        }, ],
+        // Specifying the File Selector Property
+         properties: process.platform === 'darwin' ? ['openFile', 'openDirectory'] : ['openFile']
+    }).then(file => {
+        // Stating whether dialog operation was
+        // cancelled or not.
+        console.log(file.canceled);
+        if (!file.canceled) {
+            const filepath = file.filePaths[0].toString();
+            console.log(filepath);
+            if (process.platform === 'darwin')
+                event.reply('file-loaded', filepath);
+        }  
+    }).catch(err => {
+      console.log(err)
+    });
+});
+
+ipcMain.on('save-new-file', (event, text) => {  
+
+    // If the platform is 'win32' or 'Linux'
+    // Resolves to a Promise<Object>
+    dialog.showSaveDialog ({
+        title: 'Select where to save the file',
+        defaultPath: path.join(homedir, 'Desktop'),
+        buttonLabel: 'Save',
+        // Restricting the user to only Text Files.
+        filters: [ 
+        { 
+            name: 'Slant Files', 
+            extensions: ['sla'] 
+        }, ],
+        // Specifying the File Selector Property
+         properties: process.platform === 'darwin' ? ['createDirectory'] : []
+    }).then(file => {
+        // Stating whether dialog operation was
+        // cancelled or not.
+        console.log(file.canceled);
+        if (!file.canceled) {
+            const filepath = file.filePath.toString();
+            console.log(filepath);
+            fs.writeFile(filepath, text, (err) => {
+                if (err) {
+                    console.log("An error ocurred creating the file " + err.message)
+                }
+            });
+            if (process.platform === 'darwin')
+                event.reply('file-saved', filepath);
+        }
+    }).catch(err => {
+      console.log(err)
+    });
+});
 
 require('electron-reload')(__dirname, {
     electron: require(`${__dirname}/node_modules/electron`)
