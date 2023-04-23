@@ -23,11 +23,12 @@ export default () => {
             }}>
                 <div style={{
                     backgroundColor:'#ffffff',
-
+                    position:'absolute',
                     width:'20%',
                     height:'90vh',
                     border:0,
-                    boxShadow: "0px 0px 10px #ddd"
+                    boxShadow: "0px 0px 10px #ddd",
+                    top:0, left:0
                 }}
                 zindex={1}
                 >
@@ -46,7 +47,7 @@ export default () => {
                     // border:'2px solid #000000',
                    
                 }}>
-                <div style={{position:'absolute', top: 0, left: '20.25vw', width:'80vw'}} zindex={2}>
+                <div style={{position:'absolute', top: 0, left: '20vw', width:'75vw'}} zindex={2}>
                     <MainEditor 
                         html={fileContent}
                         setHtml={setFileContent}

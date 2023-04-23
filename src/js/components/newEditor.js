@@ -176,7 +176,8 @@ export default function myEditor(props) {
         }} /> */}
 
         <h2 style={{
-            fontFamily:'Open Sans'
+            fontFamily:'Open Sans',
+            marginLeft:20,
         }}>{filePath? filePath: 'Editor'}</h2>
 
         <EditorProvider>

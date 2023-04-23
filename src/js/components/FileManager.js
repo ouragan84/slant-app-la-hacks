@@ -257,7 +257,10 @@ export default (props) => {
             {/* {fileList} */}
             {/* <FileSystem fileSystem={files}/> */}
             <div>{ directoryTree ? dfs(directoryTree) : dfs(sample)}</div>
-            <button id="open-dir-button" onClick={openWorkingDir}>Open Dir</button>
+            <div style={{width:'20vw', height:100}}>
+                <button id="open-dir-button" onClick={openWorkingDir} style={{width:100, height:30, borderRadius:100, border:0, backgroundColor:'#0080FE', color:'white', marginLeft:10, marginTop:10}}
+                >Open Folder</button>
+            </div>
     
         </>
     )
