@@ -25,10 +25,10 @@ export default () => {
                     backgroundColor:'#ffffff',
                     position:'absolute',
                     width:'20%',
-                    height:'90vh',
+                    height:'100vh',
                     border:0,
                     boxShadow: "0px 0px 10px #ddd",
-                    top:0, left:0
+                    top:0, left:0,
                 }}
                 zindex={1}
                 >

@@ -211,7 +211,7 @@ export default (props) => {
       const buildTreeObj = (tree) => {
         // console.log('tree', tree)
         if(!tree)
-            return (<h3 style={{fontFamily:'Open Sans'}}>No Directory Opened Yet</h3>);
+            return (<p style={{paddingLeft:15,fontFamily:'Open Sans'}}>No Directory Opened Yet</p>);
 
         return (
           <div>
