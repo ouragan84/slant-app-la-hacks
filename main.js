@@ -172,6 +172,13 @@ ipcMain.on('open-working-dir', (event) => {
     });
 });
 
+// ipcMain.on('ask-gpt-prompt', (event) => {  
+//     // If the platform is 'win32' or 'Linux
+//     // ask user to input a string
+
+
+// });
+
 require('electron-reload')(__dirname, {
     electron: require(`${__dirname}/node_modules/electron`)
 });
