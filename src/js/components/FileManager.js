@@ -1,12 +1,73 @@
 import React, {useState, useEffect, useRef} from "react";
-import fs from 'fs';
-import { ipcRenderer } from 'electron';
+import { BsChevronDown, BsChevronRight } from "react-icons/bs";
+import { ipcRenderer } from "electron";
+import path from "path";
+import fs from "fs";
+import { opendir } from "fs-extra";
 
 export default (props) => {
 
-    // const [filePath, setFilePath] = useState(null);
-    // const [fileContent, setFileContent] = useState('');
+    const [directoryTree, setDirectoryTree] = useState(null);
 
+    const files = props.directoryTree;
+
+    const disableTextSelection = {
+        '-moz-user-select':'none', /* firefox */
+        '-webkit-user-select': 'none', /* Safari */
+        '-ms-user-select': 'none', /* IE*/
+        'user-select': 'none'/* Standard syntax */
+    };
+
+
+    const sample = {
+        type: 'directory',
+        name: 'Open Directory Here',
+        children: [
+            {
+                type: 'directory',
+                name: 'my sub-directory 1',
+                children: [
+                    {
+                        type: 'file',
+                        name: 'Notes 1',
+                    },
+                    {
+                        type: 'file',
+                        name: 'Notes 2',
+                    }
+                ]
+            },
+            {
+                type: 'file',
+                name: 'Notes 3',
+            },
+            {
+                type: 'directory',
+                name: 'my sub-directory 2',
+                children: [
+                    {
+                        type: 'file',
+                        name: 'Notes 4',
+                    },
+                    {
+                        type: 'directory',
+                        name: 'my sub-sub-directory',
+                        children: [
+                            {
+                                type: 'file',
+                                name: 'Notes 5',
+                            },
+                            {
+                                type: 'file',
+                                name: 'Notes 6',
+                            }
+                        ]
+                    },
+                ]
+            },
+        ]
+
+    }
     const filePath = props.filePath;
     const setFilePath = props.setFilePath;
     const fileContent = props.fileContent;
@@ -63,6 +124,23 @@ export default (props) => {
             saveNotesFile();
         });
 
+        ipcRenderer.on('dir-opened', (event, dirPath) => {
+
+            console.log(readDirectory(dirPath, {
+                type:'directory',
+                name:dirPath,
+                path:dirPath,
+                children:[]
+            }))
+
+            setDirectoryTree( readDirectory(dirPath, {
+                type:'directory',
+                name:dirPath,
+                path:dirPath,
+                children:[]
+            }))
+        })
+
         return () => {
             ipcRenderer.removeAllListeners(IPCConstants.UPDATE_SALE_CUSTOMER);
         };
@@ -81,6 +159,41 @@ export default (props) => {
             // alert("Please select a file first");
         }
     };
+
+    const readDirectory = (dirPath, dirObj) => {
+
+        // console.log(dirPath)
+         
+        fs.readdir(dirPath, (err, files) => {
+            if (err)
+                return console.error("error: ", err)
+            
+            files.forEach(f => {
+                const newPath = path.join(dirPath, f);
+                if(fs.lstatSync(newPath).isDirectory()){
+                    dirObj.children.push({
+                        name: f,
+                        path: newPath,
+                        type: 'directory',
+                        children: []
+                    });
+                    const newDirObj = dirObj.children[dirObj.children.length - 1]
+                    readDirectory(newPath, newDirObj);
+                }else{
+                    if(f.slice(-4) === '.sla'){
+                        dirObj.children.push({
+                            name: f,
+                            path: newPath,
+                            type: 'file',
+                            selected: true,
+                        });
+                    }
+                }
+            });
+        })
+
+        return dirObj;
+    }
             
     function readFile(filepath) {
         fs.readFile(filepath, 'utf-8', (err, data) => {
@@ -105,11 +218,109 @@ export default (props) => {
         }); 
     }
 
+    let deselectAllFiles = (tree) => {
+        if (tree.children == null) return
+        for(let i = 0; i < tree.children.length; i++){
+            if(tree.children[i].type == 'directory'){
+                deselectAllFiles(tree)
+            }else {
+                tree.children[i].selected = false
+            }
+        }
+    }
+    
+
+      const File = ({obj, files}) => {
+        const [dynBgCol, setDynBgCol] = useState('white')
+        
+        
+        return <div 
+            onClick={()=>{
+                obj.selected = !obj.selected
+                setDynBgCol(obj.selected ? '#bcbcee' : 'white')
+            }} 
+            // onMouseEnter = {()=>{name == selectedFile ? setDynBgCol('#dcdcdc') : setDynBgCol('white')}}
+            // onMouseLeave = {()=>{name == selectedFile ? setDynBgCol('white') : setDynBgCol('#bcbcee')}}
+            style={{fontFamily: 'Open Sans', backgroundColor:dynBgCol, paddingLeft:15}}
+        >{obj.name}</div>;
+      };
+      
+      const Directory = ({ name, children , files}) => {
+        const [isOpen, setIsOpen] = useState(false);
+      
+        const toggleOpen = () => {
+          setIsOpen(!isOpen);
+        };
+        const [dynBgCol, setDynBgCol] = useState('white')
+      
+        return (
+          <div>
+            <div style={{ display: "flex", justifyContent: "space-between" ,backgroundColor:dynBgCol}}
+                // onMouseEnter = {()=>{setDynBgCol('#dcdcdc')}}
+                // onMouseLeave = {()=>{setDynBgCol('white')}}
+                onClick={toggleOpen}
+            >
+              <div style={{fontFamily: 'Open Sans', paddingLeft:15}}
+              >{name}</div>
+              {children && (
+                <BsChevronDown
+                  
+                  style={{
+                    transform: isOpen ? "rotate(180deg)" : "",
+                    cursor: "pointer",
+                    marginRight: "0.5rem",
+                    alignSelf:'center'
+                  }}
+                />
+              )}
+            </div>
+            {isOpen && (
+              <div style={{ marginLeft: "0.5rem" }}>
+                {children.map((child) => (
+                  <div key={child.name}>
+                    {child.type === "file"  ? (
+                        <File obj={child}/> 
+                    ) : (
+                        <Directory name={child.name} children={child.children} />
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      };
+      
+      const dfs = (tree) => {
+        // console.log(tree)
+        return (
+          <div>
+            {tree.children.map((node) => (
+              <div key={node.name}>
+                {(node.type === "file") ? (
+                  <File obj={node} />
+                ) : (
+                  <Directory name={node.name} children={node.children}/>
+                )}
+              </div>
+            ))}
+          </div>
+        );
+      };
+      
+      const openWorkingDir = () => {
+        ipcRenderer.send('open-working-dir');
+    }
+
+
     return (
         <>  
-            <p style={{fontSize:30, fontFamily: 'Open Sans'}}>File: {}</p>
-            <button id="load-file-button" onClick={loadNotesFile}>Load File</button>
-            <button id="save-file-button" onClick={saveNotesFile}>Save File</button>
+            <p style={{fontSize:20, fontFamily: 'Open Sans', paddingLeft:'10pt', paddingTop:'10pt'}}>Page Explorer</p>
+            {/* {fileList} */}
+            {/* <FileSystem fileSystem={files}/> */}
+            <div>{ directoryTree ? dfs(directoryTree) : dfs(sample)}</div>
+            <button id="open-dir-button" onClick={openWorkingDir}>Open Dir</button>
+    
         </>
     )
 }

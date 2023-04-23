@@ -60,7 +60,8 @@
     "sass-loader": "^13.2.2",
     "slate": "^0.94.0",
     "slate-history": "^0.93.0",
-    "slate-react": "^0.94.0"
+    "slate-react": "^0.94.0",
+    "styled-components": "^5.3.9"
   },
   "devDependencies": {
     "@babel/core": "^7.21.4",

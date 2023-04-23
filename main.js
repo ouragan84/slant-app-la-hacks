@@ -102,8 +102,7 @@ ipcMain.on('load-file', (event) => {
         if (!file.canceled) {
             const filepath = file.filePaths[0].toString();
             console.log(filepath);
-            if (process.platform === 'darwin')
-                event.reply('file-loaded', filepath);
+            event.reply('file-loaded', filepath);
         }  
     }).catch(err => {
       console.log(err)
@@ -138,9 +137,36 @@ ipcMain.on('save-new-file', (event, text) => {
                     console.log("An error ocurred creating the file " + err.message)
                 }
             });
-            if (process.platform === 'darwin')
-                event.reply('file-saved', filepath);
+            event.reply('file-saved', filepath);
         }
+    }).catch(err => {
+      console.log(err)
+    });
+});
+
+ipcMain.on('open-working-dir', (event) => {  
+    // If the platform is 'win32' or 'Linux'
+    // Resolves to a Promise<Object>
+    dialog.showOpenDialog({
+        title: 'Select the Directory to be opened',
+        defaultPath: path.join(homedir, 'Desktop'),
+        buttonLabel: 'Open',
+        // Restricting the user to only Text Files.
+        // filters: [ 
+        // { 
+        //     name: 'Slant Files', 
+        //     extensions: ['sla'] 
+        // }, ],
+        // Specifying the File Selector Property
+         properties: process.platform === 'darwin' ? ['openDirectory'] : []
+    }).then(dir => {
+        // Stating whether dialog operation was
+        // cancelled or not.
+        if (!dir.canceled) {
+            const filepath = dir.filePaths[0].toString();
+            console.log(filepath);
+            event.reply('dir-opened', filepath);
+        }  
     }).catch(err => {
       console.log(err)
     });

@@ -9,6 +9,10 @@ export default () => {
 
     const windowSize = useRef([window.innerWidth, window.innerHeight]);
 
+    const openWorkingDir = () => {
+        ipcRenderer.send('open-working-dir');
+    }
+
     return (
         <>  
             <div style={{
@@ -23,6 +27,7 @@ export default () => {
                     width:'20%',
                     height:windowSize.current[1],
                     border:0,
+                    boxShadow: "0px 0px 10px #ddd"
                 }}>
                     <FileManager
                         filePath={filePath}
