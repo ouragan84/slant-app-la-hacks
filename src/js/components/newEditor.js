@@ -157,7 +157,8 @@ export default function myEditor(props) {
 
         <EditorProvider>
             <Editor value={html} onChange={onChange} style={{
-                fontFamily:'Open Sans'
+                fontFamily:'Open Sans',
+                height:'80vh'
             }}>
                 <Toolbar>
                     <BtnBold />

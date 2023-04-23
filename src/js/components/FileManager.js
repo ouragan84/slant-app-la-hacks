@@ -22,44 +22,54 @@ export default (props) => {
     const sample = {
         type: 'directory',
         name: 'Open Directory Here',
+        pth: 'aosjdoasdojj',
         children: [
             {
                 type: 'directory',
                 name: 'my sub-directory 1',
+                pth: 'aosjdoasdojj',
                 children: [
                     {
                         type: 'file',
                         name: 'Notes 1',
+                        pth: 'aosjdoasdojj',
                     },
                     {
                         type: 'file',
                         name: 'Notes 2',
+                        pth: 'aosjdoasdojj',
                     }
                 ]
             },
             {
                 type: 'file',
                 name: 'Notes 3',
+                pth: 'aosjdoasdojj',
             },
             {
                 type: 'directory',
                 name: 'my sub-directory 2',
+                pth: 'aosjdoasdojj',
                 children: [
                     {
                         type: 'file',
                         name: 'Notes 4',
+                        pth: 'aosjdoasdojj',
                     },
                     {
                         type: 'directory',
                         name: 'my sub-sub-directory',
+                        pth: 'aosjdoasdojj',
                         children: [
                             {
                                 type: 'file',
                                 name: 'Notes 5',
+                                pth: 'aosjdoasdojj',
                             },
                             {
                                 type: 'file',
                                 name: 'Notes 6',
+                                pth: 'aosjdoasdojj',
                             }
                         ]
                     },
@@ -129,14 +139,14 @@ export default (props) => {
             console.log(readDirectory(dirPath, {
                 type:'directory',
                 name:dirPath,
-                path:dirPath,
+                pth:dirPath,
                 children:[]
             }))
 
             setDirectoryTree( readDirectory(dirPath, {
                 type:'directory',
                 name:dirPath,
-                path:dirPath,
+                pth:dirPath,
                 children:[]
             }))
         })
@@ -173,7 +183,7 @@ export default (props) => {
                 if(fs.lstatSync(newPath).isDirectory()){
                     dirObj.children.push({
                         name: f,
-                        path: newPath,
+                        pth: newPath,
                         type: 'directory',
                         children: []
                     });
@@ -183,7 +193,7 @@ export default (props) => {
                     if(f.slice(-4) === '.sla'){
                         dirObj.children.push({
                             name: f,
-                            path: newPath,
+                            pth: newPath,
                             type: 'file',
                             selected: true,
                         });
@@ -218,39 +228,28 @@ export default (props) => {
         }); 
     }
 
-    let deselectAllFiles = (tree) => {
-        if (tree.children == null) return
-        for(let i = 0; i < tree.children.length; i++){
-            if(tree.children[i].type == 'directory'){
-                deselectAllFiles(tree)
-            }else {
-                tree.children[i].selected = false
-            }
-        }
-    }
     
 
-      const File = ({obj, files}) => {
-        const [dynBgCol, setDynBgCol] = useState('white')
-        
+      const File = ({obj, files}) => {        
         
         return <div 
             onClick={()=>{
-                obj.selected = !obj.selected
-                setDynBgCol(obj.selected ? '#bcbcee' : 'white')
+                console.log(obj)
+                readFile(obj.pth)
+                setFilePath(obj.pth)
             }} 
             // onMouseEnter = {()=>{name == selectedFile ? setDynBgCol('#dcdcdc') : setDynBgCol('white')}}
             // onMouseLeave = {()=>{name == selectedFile ? setDynBgCol('white') : setDynBgCol('#bcbcee')}}
-            style={{fontFamily: 'Open Sans', backgroundColor:dynBgCol, paddingLeft:15}}
+            style={{fontFamily: 'Open Sans', backgroundColor:filePath === obj.pth ? 'bcbcee' : 'white', paddingLeft:15}}
         >{obj.name}</div>;
       };
       
       const Directory = ({ name, children , files}) => {
-        const [isOpen, setIsOpen] = useState(false);
+        // const [isOpen, setIsOpen] = useState(false);
       
-        const toggleOpen = () => {
-          setIsOpen(!isOpen);
-        };
+        // const toggleOpen = () => {
+        //   setIsOpen(!isOpen);
+        // };
         const [dynBgCol, setDynBgCol] = useState('white')
       
         return (
@@ -258,24 +257,12 @@ export default (props) => {
             <div style={{ display: "flex", justifyContent: "space-between" ,backgroundColor:dynBgCol}}
                 // onMouseEnter = {()=>{setDynBgCol('#dcdcdc')}}
                 // onMouseLeave = {()=>{setDynBgCol('white')}}
-                onClick={toggleOpen}
             >
               <div style={{fontFamily: 'Open Sans', paddingLeft:15}}
               >{name}</div>
-              {children && (
-                <BsChevronDown
-                  
-                  style={{
-                    transform: isOpen ? "rotate(180deg)" : "",
-                    cursor: "pointer",
-                    marginRight: "0.5rem",
-                    alignSelf:'center'
-                  }}
-                />
-              )}
+              
             </div>
-            {isOpen && (
-              <div style={{ marginLeft: "0.5rem" }}>
+            <div style={{ marginLeft: "0.5rem" }}>
                 {children.map((child) => (
                   <div key={child.name}>
                     {child.type === "file"  ? (
@@ -286,13 +273,12 @@ export default (props) => {
                   </div>
                 ))}
               </div>
-            )}
           </div>
         );
       };
       
       const dfs = (tree) => {
-        // console.log(tree)
+        console.log('tree', tree)
         return (
           <div>
             {tree.children.map((node) => (

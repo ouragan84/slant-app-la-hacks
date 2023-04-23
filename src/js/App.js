@@ -22,13 +22,15 @@ export default () => {
 
             }}>
                 <div style={{
-                    backgroundColor:'#eeefff',
+                    backgroundColor:'#ffffff',
 
                     width:'20%',
-                    height:windowSize.current[1],
+                    height:'90vh',
                     border:0,
                     boxShadow: "0px 0px 10px #ddd"
-                }}>
+                }}
+                zindex={1}
+                >
                     <FileManager
                         filePath={filePath}
                         fileContent={fileContent}
@@ -40,18 +42,18 @@ export default () => {
                 <div style={{
                     backgroundColor:'#ffffff',        
                     width:'80%',
-                    height:windowSize.current[1],
+                    height:'90vh',
                     // border:'2px solid #000000',
-                    padding:'30px',
                    
                 }}>
+                <div style={{position:'absolute', top: 0, left: '20.25vw', width:'80vw'}} zindex={2}>
                     <MainEditor 
                         html={fileContent}
                         setHtml={setFileContent}
-                        style={{
-                            boxShadow:'0px 0px 10px 0px #000000',
+                        style={{                            
                         }}
                     />
+                </div>
                 </div>
             </div>
         </>
