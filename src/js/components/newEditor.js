@@ -16,12 +16,15 @@ import { beautify, askQuestion, fillBlanks } from './GPTCaller';
 import ReactModal from 'react-modal';
 import { getPriority } from 'os';
 // import prompt from 'electron-prompt';
+const loading = 'https://i.gifer.com/origin/34/34338d26023e5515f6cc8969aa027bca_w200.gif';
 
 export default function myEditor(props) {
     const [html, setHtml] = [props.html, props.setHtml]
+    const filePath = props.filePath;
     const [highlightedText, setHighlightedText] = useState('');
     const [isCallingGPT, setIsCallingGPT] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isWaitingForUser, setIsWaitingForUser] = useState(false);
     const [modalInput, setModalInput] = useState('');
     const [selection, setSelection] = useState(null);
     const [rangeGPT, setRangeGPT] = useState(null);
@@ -75,6 +78,8 @@ export default function myEditor(props) {
         setSelection(sel);
         setModalInput('');
         setIsModalOpen(true);
+
+        setIsWaitingForUser(true);
 
         setRangeGPT(range);
         setIsCallingGPT(true);
@@ -170,10 +175,15 @@ export default function myEditor(props) {
             fontFamily:'Open Sans',
         }} /> */}
 
+        <h2 style={{
+            fontFamily:'Open Sans'
+        }}>{filePath? filePath: 'Editor'}</h2>
+
         <EditorProvider>
             <Editor value={html} onChange={onChange} style={{
                 fontFamily:'Open Sans',
-                height:'80vh'
+                height:'80vh',
+                overflowY:'scroll',
             }}>
                 <Toolbar>
                     <BtnBold />
@@ -195,15 +205,58 @@ export default function myEditor(props) {
                     <BtnFillBlanks />
                     <Separator />
                     <BtnDesmos />
+                    <img src={loading} style={{
+                        display: isCallingGPT ? 'block' : 'none',
+                        width:'20px',
+                        height:'20px',
+                        marginLeft:'auto',
+                        marginRight:'auto'
+                    }}/>
                 </Toolbar>
             </Editor>
         </EditorProvider>
 
-        <ReactModal isOpen={isModalOpen} onRequestClose={() => setIsModalOpen(false)}>
-            <input type="text" value={modalInput} onChange={(e) => setModalInput(e.target.value)} />
+        <ReactModal isOpen={isModalOpen} onRequestClose={() => {setIsModalOpen(false); setIsCallingGPT(false)}} style={{
+            overlay: {
+                backgroundColor: 'rgba(0,0,0,0.5)'
+            },
+
+            content: {
+                width: '300px',
+                height: '120px',
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                right: 'auto',
+                bottom: 'auto',
+                marginTop: '50px',
+                transform: 'translate(-50%, -50%)',
+                justifyContent: 'center',
+                alignItems: 'center',
+                display: 'flex',
+                flexDirection: 'column',
+                backgroundColor: 'white',
+                border: '1px solid #ccc',
+                borderRadius: '5px',
+                paddingTop: '10px',
+                fontFamily: 'Open Sans'
+            }
+        }}>
+            <input type="text" value={modalInput} onChange={(e) => setModalInput(e.target.value)} style={{
+                width:'90%',
+                height:'30px',
+                padding:'5px',
+                fontFamily:'Open Sans',
+                borderRadius:'5px',
+                border:'1px solid #ccc'
+            }}/>
+            <br/>
             <button onClick={async () => {
 
                 const question = modalInput;
+
+                setIsWaitingForUser(false)
+
 
                 if(!question || question.length < 1)
                     return;
@@ -213,7 +266,22 @@ export default function myEditor(props) {
                     setIsCallingGPT(false);
                     setIsModalOpen(false);
                 });
+            }} style={{
+                width:'90%',
+                height:'30px',
+                fontSize:'20px',
+                padding:'5px',
+                fontFamily:'Open Sans',
+                borderRadius:'5px',
+                border:'1px solid #ccc'
+
             }}>Submit</button>
+            <br/>
+            <img src={loading} style={{
+                display: isCallingGPT  && !isWaitingForUser ? 'block' : 'none',
+                width:'30px',
+                height:'30px',
+            }}/>
         </ReactModal>
 
         {/* <button onClick={() => console.log(getHighlightedText())}>Get Highlighted Text</button>

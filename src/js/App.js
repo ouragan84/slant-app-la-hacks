@@ -50,6 +50,7 @@ export default () => {
                     <MainEditor 
                         html={fileContent}
                         setHtml={setFileContent}
+                        filePath={filePath}
                         style={{                            
                         }}
                     />
