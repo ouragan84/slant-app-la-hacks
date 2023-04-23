@@ -47,14 +47,16 @@ async function createWindow() {
                 {
                     label: 'Open Note',
                     click: () => {
-                        win.webContents.send('load-file');
-                    }
+                        win.webContents.send('open-dir');
+                    },
+                    accelerator: 'CmdOrCtrl+O'
                 },
                 {
                     label: 'Save Note',
                     click: () => {
                         win.webContents.send('save-file');
-                    }
+                    },
+                    accelerator: 'CmdOrCtrl+S'
                 },
             ]
         },

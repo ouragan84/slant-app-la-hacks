@@ -24,57 +24,6 @@ export default (props) => {
         name: 'Open Directory Here',
         pth: 'aosjdoasdojj',
         children: [
-            {
-                type: 'directory',
-                name: 'my sub-directory 1',
-                pth: 'aosjdoasdojj',
-                children: [
-                    {
-                        type: 'file',
-                        name: 'Notes 1',
-                        pth: 'aosjdoasdojj',
-                    },
-                    {
-                        type: 'file',
-                        name: 'Notes 2',
-                        pth: 'aosjdoasdojj',
-                    }
-                ]
-            },
-            {
-                type: 'file',
-                name: 'Notes 3',
-                pth: 'aosjdoasdojj',
-            },
-            {
-                type: 'directory',
-                name: 'my sub-directory 2',
-                pth: 'aosjdoasdojj',
-                children: [
-                    {
-                        type: 'file',
-                        name: 'Notes 4',
-                        pth: 'aosjdoasdojj',
-                    },
-                    {
-                        type: 'directory',
-                        name: 'my sub-sub-directory',
-                        pth: 'aosjdoasdojj',
-                        children: [
-                            {
-                                type: 'file',
-                                name: 'Notes 5',
-                                pth: 'aosjdoasdojj',
-                            },
-                            {
-                                type: 'file',
-                                name: 'Notes 6',
-                                pth: 'aosjdoasdojj',
-                            }
-                        ]
-                    },
-                ]
-            },
         ]
 
     }
@@ -107,7 +56,7 @@ export default (props) => {
                 saveNotesFile();
             }
             if (isCmd && event.key === 'o') {
-                loadNotesFile();
+                openWorkingDir();
             }
         };
       
@@ -124,9 +73,10 @@ export default (props) => {
             setFilePath(file);
         });
     
-        ipcRenderer.on('load-file', (event) => {
-            console.log('loading file')
-            loadNotesFile();
+        ipcRenderer.on('open-dir', (event) => {
+            // console.log('loading file')
+            // loadNotesFile();
+            openWorkingDir();
         });
     
         ipcRenderer.on('save-file', (event) => {
@@ -136,12 +86,12 @@ export default (props) => {
 
         ipcRenderer.on('dir-opened', (event, dirPath) => {
 
-            console.log(readDirectory(dirPath, {
-                type:'directory',
-                name:dirPath,
-                pth:dirPath,
-                children:[]
-            }))
+            // console.log(readDirectory(dirPath, {
+            //     type:'directory',
+            //     name:dirPath,
+            //     pth:dirPath,
+            //     children:[]
+            // }))
 
             setDirectoryTree( readDirectory(dirPath, {
                 type:'directory',
@@ -149,6 +99,8 @@ export default (props) => {
                 pth:dirPath,
                 children:[]
             }))
+
+            setFileContent(fileContent + '');
         })
 
         return () => {
