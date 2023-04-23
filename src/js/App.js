@@ -2,6 +2,7 @@ import React, {useState, useEffect, useRef} from "react";
 import ReactDOM from "react-dom";
 import FileManager from "./components/FileManager";
 import fs from 'fs';
+import path from 'path';
 import { ipcRenderer } from 'electron';
 
 export default () => {
@@ -23,6 +24,7 @@ export default () => {
         }
     }
 
+    const [directoryTree, setDirectoryTree] = useState(null);
     const [filePath, setFilePath] = useState(null);
     const [fileContent, setFileContent] = useState('');
 
@@ -73,6 +75,23 @@ export default () => {
             console.log('saving file')
             saveNotesFile();
         });
+        
+        ipcRenderer.on('dir-opened', (event, dirPath) => {
+
+            console.log(readDirectory(dirPath, {
+                type:'directory',
+                name:dirPath,
+                path:dirPath,
+                children:[]
+            }))
+
+            setDirectoryTree( readDirectory(dirPath, {
+                type:'directory',
+                name:dirPath,
+                path:dirPath,
+                children:[]
+            }))
+        })
 
         return () => {
             ipcRenderer.removeAllListeners(IPCConstants.UPDATE_SALE_CUSTOMER);
@@ -92,6 +111,41 @@ export default () => {
             // alert("Please select a file first");
         }
     };
+
+    const readDirectory = (dirPath, dirObj) => {
+
+        // console.log(dirPath)
+         
+        fs.readdir(dirPath, (err, files) => {
+            if (err)
+                return console.error("error: ", err)
+            
+            files.forEach(f => {
+                const newPath = path.join(dirPath, f);
+                if(fs.lstatSync(newPath).isDirectory()){
+                    dirObj.children.push({
+                        name: f,
+                        path: newPath,
+                        type: 'directory',
+                        children: []
+                    });
+                    const newDirObj = dirObj.children[dirObj.children.length - 1]
+                    readDirectory(newPath, newDirObj);
+                }else{
+                    if(f.slice(-4) === '.sla'){
+                        dirObj.children.push({
+                            name: f,
+                            path: newPath,
+                            type: 'file',
+                            selected: true,
+                        });
+                    }
+                }
+            });
+        })
+
+        return dirObj;
+    }
 
     const handleNewCharacter = (event) => {
         // console.log('Change event: ', event)
@@ -122,6 +176,10 @@ export default () => {
         }); 
     }
 
+    const openWorkingDir = () => {
+        ipcRenderer.send('open-working-dir');
+    }
+
     return (
         <>  
             <div style={{
@@ -129,19 +187,24 @@ export default () => {
                 justifyContent:'space-between'
             }}>
                 <div style={{
-                    backgroundColor:'#eeefff',
+                    backgroundColor:'white',
                     width:'20%',
                     height:windowSize.current[1],
                     border:0,
+                    boxShadow: "0px 0px 10px #ddd"
                 }}>
-                <FileManager/>
+                <FileManager
+                    directoryTree = {directoryTree}
+                />
                 </div>
-                <div style={textEditorStyle.outer} >
+                {/* <div style={textEditorStyle.outer} >
                     <textarea id="file-input" style={textEditorStyle.inner} value={fileContent} onChange={handleNewCharacter}/>
-                </div>
+                </div> */}
 
                 <button id="load-file-button" onClick={loadNotesFile}>Load File</button>
                 <button id="save-file-button" onClick={saveNotesFile}>Save File</button>
+                <button id="open-dir-button" onClick={openWorkingDir}>Open Dir</button>
+
             </div>
         </>
     )

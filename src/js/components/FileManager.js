@@ -2,9 +2,35 @@ import React, {useState, useEffect, useRef} from "react";
 import { BsChevronDown, BsChevronRight } from "react-icons/bs";
 
 
-export default () => {
+export default (props) => {
 
-    const files = {
+    const files = props.directoryTree;
+
+    // let filterFiles = (tree) => {
+    //     if (tree.children == null) return
+    //     for(let i = 0; i < tree.children.length; i++){
+    //         if(tree.children[i].type == 'directory'){
+    //             filterFiles(tree.children)
+    //         }else if (tree.children[i].type == 'file'){
+    //             if(tree.children[i].name.slice(-4) != '.sla'){
+    //                 tree.children.splice(i, 1)
+    //             }
+    //         }
+    //     }
+    //     return tree
+    // }
+
+    // const files = filterFiles(filesUnfiltered)
+
+    const disableTextSelection = {
+        '-moz-user-select':'none', /* firefox */
+        '-webkit-user-select': 'none', /* Safari */
+        '-ms-user-select': 'none', /* IE*/
+        'user-select': 'none'/* Standard syntax */
+    };
+
+
+    const sample = {
         type: 'directory',
         name: 'my working directory',
         children: [
@@ -54,7 +80,7 @@ export default () => {
 
     }
 
-    let fileList = []
+    let selectedFile = null
     //console.log(files.children)
     // for (let i = 0; i < files.children.length; i++){
 
@@ -142,29 +168,59 @@ export default () => {
 
     //   import React, { useState } from "react";
     //   import { BsChevronDown } from "react-icons/bs";
-      
-      const File = ({ name }) => {
-        return <div style={{ marginLeft: "0.5rem" }}>{name}</div>;
+
+    let deselectAllFiles = (tree) => {
+        if (tree.children == null) return
+        for(let i = 0; i < tree.children.length; i++){
+            if(tree.children[i].type == 'directory'){
+                deselectAllFiles(tree)
+            }else {
+                tree.children[i].selected = false
+            }
+        }
+    }
+    
+
+      const File = ({obj, files}) => {
+        const [dynBgCol, setDynBgCol] = useState('white')
+        
+        
+        return <div 
+            onClick={()=>{
+                obj.selected = !obj.selected
+                setDynBgCol(obj.selected ? '#bcbcee' : 'white')
+            }} 
+            // onMouseEnter = {()=>{name == selectedFile ? setDynBgCol('#dcdcdc') : setDynBgCol('white')}}
+            // onMouseLeave = {()=>{name == selectedFile ? setDynBgCol('white') : setDynBgCol('#bcbcee')}}
+            style={{fontFamily: 'Open Sans', backgroundColor:dynBgCol, paddingLeft:15}}
+        >{obj.name}</div>;
       };
       
-      const Directory = ({ name, children }) => {
+      const Directory = ({ name, children , files}) => {
         const [isOpen, setIsOpen] = useState(false);
       
         const toggleOpen = () => {
           setIsOpen(!isOpen);
         };
+        const [dynBgCol, setDynBgCol] = useState('white')
       
         return (
           <div>
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <div>{name}</div>
+            <div style={{ display: "flex", justifyContent: "space-between" ,backgroundColor:dynBgCol}}
+                // onMouseEnter = {()=>{setDynBgCol('#dcdcdc')}}
+                // onMouseLeave = {()=>{setDynBgCol('white')}}
+                onClick={toggleOpen}
+            >
+              <div style={{fontFamily: 'Open Sans', paddingLeft:15}}
+              >{name}</div>
               {children && (
                 <BsChevronDown
-                  onClick={toggleOpen}
+                  
                   style={{
                     transform: isOpen ? "rotate(180deg)" : "",
                     cursor: "pointer",
                     marginRight: "0.5rem",
+                    alignSelf:'center'
                   }}
                 />
               )}
@@ -173,8 +229,8 @@ export default () => {
               <div style={{ marginLeft: "0.5rem" }}>
                 {children.map((child) => (
                   <div key={child.name}>
-                    {child.type === "file" ? (
-                      <File name={child.name} />
+                    {child.type === "file"  ? (
+                        <File obj={child}/> 
                     ) : (
                         <Directory name={child.name} children={child.children} />
                     )}
@@ -188,13 +244,13 @@ export default () => {
       
       const dfs = (tree) => {
         return (
-          <div>
+          <div onClick={()=>deselectAllFiles(tree)}>
             {tree.children.map((node) => (
               <div key={node.name}>
-                {node.type === "file" ? (
-                  <File name={node.name} />
+                {(node.type === "file") ? (
+                  <File obj={node} />
                 ) : (
-                  <Directory name={node.name} children={node.children} />
+                  <Directory name={node.name} children={node.children}/>
                 )}
               </div>
             ))}
@@ -202,20 +258,16 @@ export default () => {
         );
       };
       
-    function FileTree({data}) {
-        
-      
-        return <div>{dfs(data)}</div>;
-      }
-       
+
 
 
     return (
         <>  
-            <p style={{fontSize:20, fontFamily: 'Open Sans', paddingLeft:'10pt'}}>Page Explorer</p>
+            <p style={{fontSize:20, fontFamily: 'Open Sans', paddingLeft:'10pt', paddingTop:'10pt'}}>Page Explorer</p>
             {/* {fileList} */}
             {/* <FileSystem fileSystem={files}/> */}
-            <FileTree data={files} />
+            <div>{ files ? dfs(files) : dfs(sample)}</div>
+    
         </>
     )
 }
