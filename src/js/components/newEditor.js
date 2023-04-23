@@ -49,6 +49,7 @@ export default function myEditor(props) {
     <>
         <Editor value={html} onChange={onChange} style={{
             fontFamily:'Open Sans',
+            height:'80vh',
         }} />
         <button onClick={() => console.log(getHighlightedText())}>Get Highlighted Text</button>
         <button onClick={() => console.log(pasteHtmlAtCaret('<code>poop</code>'))}>Set Highlighted Text</button>
