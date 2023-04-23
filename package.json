@@ -37,6 +37,7 @@
     "@emotion/css": "^11.10.6",
     "alloyeditor": "^2.14.9",
     "child_process": "^1.0.2",
+    "desmos-react": "^1.2.0",
     "dialog": "^0.3.1",
     "draft-js": "^0.11.7",
     "electron": "^24.1.2",

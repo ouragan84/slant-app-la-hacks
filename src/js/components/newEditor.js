@@ -113,6 +113,21 @@ export default function myEditor(props) {
         });
     });
 
+    const BtnDesmos = createButton('Add Desmos Graph', 'DG', () => {
+        const sel = window.getSelection();
+        if (!sel.getRangeAt || !sel.rangeCount)
+            return;
+
+        const range = sel.getRangeAt(0);
+
+        // make the end of the range be at the start of the range so that the prompt is inserted at the cursor
+        range.setEnd(range.startContainer, range.startOffset);
+
+        const desmosHtml = `<iframe src="https://www.desmos.com/calculator/" width="600px" style="min-height:400px"></iframe>`;
+
+        pasteHtmlAtCaret(desmosHtml, range, sel);
+    });
+
 
 
     //funtion to get the raw html that is highlighted in the editor
@@ -180,6 +195,8 @@ export default function myEditor(props) {
                     <BtnBeautify />
                     <BtnPrompt />
                     <BtnFillBlanks />
+                    <Separator />
+                    <BtnDesmos />
                 </Toolbar>
             </Editor>
         </EditorProvider>
