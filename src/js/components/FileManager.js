@@ -30,10 +30,12 @@ export default (props) => {
     // When the crtl + s is pressed, save the file to the disk
     useEffect(() => {
         const handleKeyDown = (event) => {
-            if (event.metaKey && event.key === 's') {
+            const isCmd = process.platform === 'darwin' ? event.metaKey : event.crtlKey;
+
+            if (isCmd&& event.key === 's') {
                 saveNotesFile();
             }
-            if (event.metaKey && event.key === 'o') {
+            if (isCmd && event.key === 'o') {
                 loadNotesFile();
             }
         };

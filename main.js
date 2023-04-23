@@ -1,6 +1,7 @@
 const { BrowserWindow, app, ipcMain, Menu, dialog} = require('electron');
 const fs = require("fs");
 const path = require('path');
+const url = require('url')
 const homedir = require('os').homedir();
 
 console.log('homedir', homedir)
@@ -8,8 +9,8 @@ console.log('homedir', homedir)
 
 async function createWindow() {
     let win = new BrowserWindow({
-        width: 800, 
-        height: 600,
+        width: 1200, 
+        height: 800,
         backgroundColor: '#ffffff',
         webPreferences: {
             nodeIntegration: true,
@@ -20,7 +21,7 @@ async function createWindow() {
         }
     });
 
-    win.loadFile('index.html');
+    win.loadURL(path.join('file://', __dirname, 'index.html'));
 
     win.setTitle('Slant');
 
@@ -35,25 +36,22 @@ async function createWindow() {
         {
             label: 'Slant',
             submenu: [
-                { 
-                    label: process.platform === 'darwin' ? 'Quit' : 'Exit',
-                    click: () => {
-                        app.quit();
-                    }
-                },
+                {role: 'quit'},
+                {role: 'close'},
+                {role: 'about'},
             ]
         },
         {
             label: 'File',
             submenu: [
                 {
-                    label: 'Open',
+                    label: 'Open Note',
                     click: () => {
                         win.webContents.send('load-file');
                     }
                 },
                 {
-                    label: 'Save',
+                    label: 'Save Note',
                     click: () => {
                         win.webContents.send('save-file');
                     }
@@ -71,6 +69,12 @@ async function createWindow() {
                 { role: 'paste' },
             ]
 
+        },
+        {
+            label: 'View',
+            submenu: [
+                {role: 'toggleDevTools'}
+            ]
         }
     ]);
 
@@ -95,7 +99,6 @@ ipcMain.on('load-file', (event) => {
     }).then(file => {
         // Stating whether dialog operation was
         // cancelled or not.
-        console.log(file.canceled);
         if (!file.canceled) {
             const filepath = file.filePaths[0].toString();
             console.log(filepath);
@@ -126,7 +129,7 @@ ipcMain.on('save-new-file', (event, text) => {
     }).then(file => {
         // Stating whether dialog operation was
         // cancelled or not.
-        console.log(file.canceled);
+        // console.log(file.canceled);
         if (!file.canceled) {
             const filepath = file.filePath.toString();
             console.log(filepath);
