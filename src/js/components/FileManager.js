@@ -8,36 +8,13 @@ import { opendir } from "fs-extra";
 export default (props) => {
 
     const [directoryTree, setDirectoryTree] = useState(null);
+    // const [treeObj, setTreeObj] = useState(<h3 style={{fontFamily:'Open Sans'}}>No Directory Opened Yet</h3>);
 
-    const files = props.directoryTree;
-
-    const disableTextSelection = {
-        '-moz-user-select':'none', /* firefox */
-        '-webkit-user-select': 'none', /* Safari */
-        '-ms-user-select': 'none', /* IE*/
-        'user-select': 'none'/* Standard syntax */
-    };
-
-
-    const sample = {
-        type: 'directory',
-        name: 'Open Directory Here',
-        pth: 'aosjdoasdojj',
-        children: [
-        ]
-
-    }
     const filePath = props.filePath;
     const setFilePath = props.setFilePath;
     const fileContent = props.fileContent;
     const setFileContent = props.setFileContent;
 
-
-    const loadNotesFile = () => {
-        // console.log('loadNotesFile')
-        // console.log( dialog.showOpenDialog({ properties: ['openFile'] }))
-        ipcRenderer.send('load-file');
-    };
 
     const latestFileContent = useRef(fileContent);
     const latestFilePath = useRef(filePath);
@@ -61,12 +38,6 @@ export default (props) => {
         };
       
         document.addEventListener('keydown', handleKeyDown);
-
-        ipcRenderer.on('file-loaded', (event, file) => {
-            console.log('obtained file from main process: ' + file);
-            setFilePath(file);
-            readFile(file);
-        });
     
         ipcRenderer.on('file-saved', (event, file) => {
             console.log('file saves ' + file);
@@ -85,22 +56,8 @@ export default (props) => {
         });
 
         ipcRenderer.on('dir-opened', (event, dirPath) => {
-
-            // console.log(readDirectory(dirPath, {
-            //     type:'directory',
-            //     name:dirPath,
-            //     pth:dirPath,
-            //     children:[]
-            // }))
-
-            setDirectoryTree( readDirectory(dirPath, {
-                type:'directory',
-                name:dirPath,
-                pth:dirPath,
-                children:[]
-            }))
-
-            setFileContent(fileContent + '');
+            console.log("got message ")
+            buildDirectory(dirPath);
         })
 
         return () => {
@@ -121,6 +78,28 @@ export default (props) => {
             // alert("Please select a file first");
         }
     };
+
+    const buildDirectory = (dirPath) => {
+
+        console.log('building DIR ' + dirPath)
+        let tree = readDirectory(dirPath, {
+            type:'directory',
+            name:dirPath,
+            pth:dirPath,
+            children:[]
+        })
+
+        setDirectoryTree( tree )
+
+        console.log('TREE:', tree)
+
+        
+        // wait 50 ms
+        setTimeout(() => {
+            console.log('triggering re-render')
+            setDirectoryTree( {...tree} )
+        }, 50);
+    }
 
     const readDirectory = (dirPath, dirObj) => {
 
@@ -202,11 +181,11 @@ export default (props) => {
         // const toggleOpen = () => {
         //   setIsOpen(!isOpen);
         // };
-        const [dynBgCol, setDynBgCol] = useState('white')
+        // const [dynBgCol, setDynBgCol] = useState('white')
       
         return (
           <div>
-            <div style={{ display: "flex", justifyContent: "space-between" ,backgroundColor:dynBgCol}}
+            <div style={{ display: "flex", justifyContent: "space-between" ,backgroundColor:'white'}}
                 // onMouseEnter = {()=>{setDynBgCol('#dcdcdc')}}
                 // onMouseLeave = {()=>{setDynBgCol('white')}}
             >
@@ -229,8 +208,11 @@ export default (props) => {
         );
       };
       
-      const dfs = (tree) => {
-        console.log('tree', tree)
+      const buildTreeObj = (tree) => {
+        // console.log('tree', tree)
+        if(!tree)
+            return (<h3 style={{fontFamily:'Open Sans'}}>No Directory Opened Yet</h3>);
+
         return (
           <div>
             {tree.children.map((node) => (
@@ -245,8 +227,10 @@ export default (props) => {
           </div>
         );
       };
+
+    
       
-      const openWorkingDir = () => {
+    const openWorkingDir = () => {
         ipcRenderer.send('open-working-dir');
     }
 
@@ -256,7 +240,8 @@ export default (props) => {
             <p style={{fontSize:20, fontFamily: 'Open Sans', paddingLeft:'10pt', paddingTop:'10pt'}}>Page Explorer</p>
             {/* {fileList} */}
             {/* <FileSystem fileSystem={files}/> */}
-            <div>{ directoryTree ? dfs(directoryTree) : dfs(sample)}</div>
+            <div>{ buildTreeObj(directoryTree) }</div>
+
             <div style={{width:'20vw', height:100}}>
                 <button id="open-dir-button" onClick={openWorkingDir} style={{width:100, height:30, borderRadius:100, border:0, backgroundColor:'#0080FE', color:'white', marginLeft:10, marginTop:10}}
                 >Open Folder</button>

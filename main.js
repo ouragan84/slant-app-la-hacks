@@ -165,9 +165,9 @@ ipcMain.on('open-working-dir', (event) => {
         // Stating whether dialog operation was
         // cancelled or not.
         if (!dir.canceled) {
-            const filepath = dir.filePaths[0].toString();
-            console.log(filepath);
-            event.reply('dir-opened', filepath);
+            const dirPath = dir.filePaths[0].toString();
+            console.log(dirPath);
+            event.reply('dir-opened', dirPath);
         }  
     }).catch(err => {
       console.log(err)

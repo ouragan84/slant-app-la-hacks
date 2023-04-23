@@ -12,7 +12,6 @@ const question_prompt = `
 I will tell you a prompt, and you need to answer it. Please be concise and write in clear language. Add your answer to an HTML-type document. Do not add a header, just the elements that I ask you, wrapped inside a <div> </div> element. Add text that belongs to a section title inside an element of type <h1> text </h1>. Add text that belongs to a section sub-title inside an element of type <h2> text </h2>. Add text that belongs to an unordered list inside an element of type <ul> <li> text 1 </li> <li> text 2 </li> </ul>. Add text that belongs to an ordered list inside an element of type <ol> <li> text 1 </li> <li> text 2 </li> </ol>. Add any code to an element of type <pre> text </pre>. Add any text that belongs inside a normal paragraph to an element of type <p> text <\p>. Add a tag <br/> at any point where the text should return to the next line. Wrap any text in an element <i> text </i> to italicize it. Italicize text to emphasize quotations and important words, and math formulas. Wrap any text in an element <b> text </b> to bold it. Bold text to emphasize very important words. Wrap any text in an element <u> text </u> to underline it. Underline text to emphasize important words. Wrap any text in an element <strike> text </strike> to strike through it. Strike text to show that something is wrong or outdated. Please escape any characters that would break the HTML format.
 `
 
-
 const sample_question = `
 NOtes abut cats
 
