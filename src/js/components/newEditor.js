@@ -188,8 +188,6 @@ export default function myEditor(props) {
                     <BtnUndo />
                     <BtnRedo />
                     <Separator />
-                    <BtnLink />
-                    <Separator />
                     <BtnStyles />
                     <Separator />
                     <BtnBeautify />
